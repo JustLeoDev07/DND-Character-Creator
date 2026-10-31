@@ -111,6 +111,66 @@ weapon_attack_types = {
     "Net": "Ranged",
 }
 
+weapon_properties = {
+    # Melee Weapons
+    "Club": ["Light"],
+    "Dagger": ["Finesse", "Light", "Thrown"],
+    "Greatclub": ["Two-Handed"],
+    "Handaxe": ["Light", "Thrown"],
+    "Javelin": ["Thrown"],
+    "Light Hammer": ["Light", "Thrown"],
+    "Mace": [],
+    "Quarterstaff": ["Versatile"],
+    "Sickle": ["Light"],
+    "Spear": ["Thrown", "Versatile"],
+
+    "Battleaxe": ["Versatile"],
+    "Flail": [],
+    "Glaive": ["Heavy", "Reach", "Two-Handed"],
+    "Greataxe": ["Heavy", "Two-Handed"],
+    "Greatsword": ["Heavy", "Two-Handed"],
+    "Halberd": ["Heavy", "Reach", "Two-Handed"],
+    "Lance": ["Reach", "Special"],
+    "Longsword": ["Versatile"],
+    "Maul": ["Heavy", "Two-Handed"],
+    "Morningstar": [],
+    "Pike": ["Heavy", "Reach", "Two-Handed"],
+    "Rapier": ["Finesse"],
+    "Scimitar": ["Finesse", "Light"],
+    "Shortsword": ["Finesse", "Light"],
+    "Trident": ["Thrown", "Versatile"],
+    "War Pick": [],
+    "Warhammer": ["Versatile"],
+    "Whip": ["Finesse", "Reach"],
+
+    # Ranged Weapons
+    "Light Crossbow": ["Ammunition", "Loading", "Two-Handed"],
+    "Dart": ["Finesse", "Thrown"],
+    "Shortbow": ["Ammunition", "Two-Handed"],
+    "Sling": ["Ammunition"],
+
+    "Blowgun": ["Ammunition", "Loading"],
+    "Hand Crossbow": ["Ammunition", "Light", "Loading"],
+    "Heavy Crossbow": ["Ammunition", "Heavy", "Loading", "Two-Handed"],
+    "Longbow": ["Ammunition", "Heavy", "Two-Handed"],
+    "Net": ["Special", "Thrown"]
+}
+
+armour_names = [
+    "Padded Armour",
+    "Leather Armour",
+    "Studded Leather Armour",
+    "Hide Armour",
+    "Chain Shirt",
+    "Scale Mail",
+    "Breastplate",
+    "Half Plate",
+    "Ring Mail",
+    "Chain Mail",
+    "Splint",
+    "Plate"
+]
+
 available_tool_types = {
     "Artisan's Tools": ["Smith's Tools", "Carpenter's Tools", "Alchemist's Tools", "Brewer's Supplies"
                         , "Calligrapher's Supplies", "Cartographer's Tools", "Cobbler's Tools", "Cook's Utensils", "Glassblower's Tools",
@@ -873,6 +933,241 @@ def get_available_weapons(category, attack_type=None):
                 available_weapons.append(weapon_name)
 
     return available_weapons
+
+def get_available_armour(inventory):
+    available_armour = []
+    for items in inventory:
+        if items in armour_names and inventory[items] > 0:
+            available_armour.append(items)
+    return available_armour
+
+def get_owned_weapons(inventory):
+    available_weapons = []
+    for items in inventory:
+        if items in weapon_categories and inventory[items] > 0:
+            available_weapons.append(items)
+    return available_weapons
+
+def confirm_unequip_shield():
+    while True:
+        answer = input("\nWould you like to unequip your shield? (yes/no): ").strip().lower()
+
+        if answer == "yes":
+            return True
+        elif answer == "no":
+            return False
+        else:
+            print("That's not a valid answer, please reply with yes or no!")
+
+def choose_equipped_armour(inventory):
+    available_armour = get_available_armour(inventory)
+    print("\nChoose which armour you would like to equip:")
+
+    print("0. Remain Unarmoured")
+    for number, armour in enumerate(available_armour, start=1):
+        print(f"{number}. {armour}")
+    while True:
+        try:
+            choice = int(input("\nEnter the number of the armour you would like to equip:"))
+
+            if choice == 0:
+                return None
+
+            elif 1 <= choice <= len(available_armour):
+                return available_armour[choice - 1]
+
+            else:
+                print("That's not a valid armour!")
+
+        except ValueError:
+            print("Please enter a valid armour number!")
+
+def choose_equipped_weapon(inventory, equipped_shield ):
+    available_weapons = get_owned_weapons(inventory)
+
+    if not available_weapons:
+        print("You don't have any weapons to equip!")
+        return [], equipped_shield
+
+    while True:
+        print("\nChoose which weapon you would like to equip:")
+        print("""Choose how you want to hold your weapons for battle:
+        1. One-handed weapon
+        2. Two handed weapon
+        3. Duel-wield weapons""")
+        choice = input("\nEnter your choice: ").strip()
+        if choice == "1":
+            print("One-handed weapon selected")
+
+            one_handed_weapons = []
+
+            for weapon in available_weapons:
+                if "Two-Handed" not in weapon_properties[weapon]:
+                    one_handed_weapons.append(weapon)
+
+            if not one_handed_weapons:
+                print("You don't own any suitable one-handed weapons!")
+
+            else:
+                for number, weapon in enumerate(one_handed_weapons, start=1):
+                    print(f"{number}. {weapon}")
+                while True:
+                    try:
+                        weapon_choice = int(input("\nEnter the number of the weapon you would like to equip:"))
+
+                        if 1 <= weapon_choice <= len(one_handed_weapons):
+                            break
+                        else:
+                            print("Please enter a valid NUMBER!")
+
+                    except ValueError:
+                        print("Please enter a valid number!")
+                selected_weapon = one_handed_weapons[weapon_choice - 1]
+                return [{"weapon": selected_weapon, "hands": 1}], equipped_shield
+
+        elif choice == "2":
+            print("Two-Handed weapon selected")
+
+            two_handed_weapons = []
+
+            for weapon in available_weapons:
+                if "Two-Handed" in weapon_properties[weapon] or "Versatile" in weapon_properties[weapon]:
+                    two_handed_weapons.append(weapon)
+
+            if not two_handed_weapons:
+                print("You don't own any suitable weapons to use two-handed!")
+            else:
+                if equipped_shield:
+                    print("\nYou currently have a shield equipped...")
+                    print("\nUnfortunately, you cannot use a two-handed weapon and a shield simultaneously.")
+
+                    if confirm_unequip_shield():
+                        equipped_shield = False
+                        print("Your shield has been unequipped.")
+                    else:
+                        print("Keeping your shield equipped.")
+                        continue
+
+                for number, weapon in enumerate(two_handed_weapons, start=1):
+                    print(f"{number}. {weapon}")
+                while True:
+                    try:
+                        weapon_choice = int(input("\nEnter the number of the weapon you would like to equip:"))
+
+                        if 1 <= weapon_choice <= len(two_handed_weapons):
+                            break
+                        else:
+                            print("Please enter a valid NUMBER")
+
+                    except ValueError:
+                        print("Please enter a valid number!")
+                selected_weapon = two_handed_weapons[weapon_choice - 1]
+                print(f"You selected {selected_weapon} to wield with two hands!")
+
+                return [{"weapon": selected_weapon, "hands": 2}], equipped_shield
+        elif choice == "3":
+            print("Dual-wielding selected")
+
+            dual_wield_weapons = []
+
+            for weapon in available_weapons:
+                if "Light" in weapon_properties[weapon] and weapon_attack_types[weapon] == "Melee":
+                    dual_wield_weapons.append(weapon)
+
+            total_duel_wield_weapons = 0
+
+            for weapon in dual_wield_weapons:
+                total_duel_wield_weapons += inventory[weapon]
+
+            if total_duel_wield_weapons < 2:
+                print("You need atleast 2 suitable weapons to duel-wield!")
+
+            else:
+                if equipped_shield:
+                    print("\nYou currently have a shield equipped...")
+                    print("\nUnfortunately, you cannot use duel wield with a shield equipped.")
+
+                    if confirm_unequip_shield():
+                        equipped_shield = False
+                        print("Your shield has been unequipped.")
+                    else:
+                        print("Keeping your shield equipped.")
+                        continue
+
+                for number, weapon in enumerate(dual_wield_weapons, start=1):
+                    print(f"{number}. {weapon} (Owned: {inventory[weapon]})")
+
+                while True:
+                    try:
+                        first_choice = int(input("\nChoose your first weapon:"))
+
+                        if 1 <= first_choice <= len(dual_wield_weapons):
+                            break
+                        else:
+                            print("Please enter a valid weapon NUMBER!")
+
+                    except ValueError:
+                        print("Please enter a valid number!")
+
+                first_weapon = dual_wield_weapons[first_choice - 1]
+                print(f"First weapon selected: {first_weapon}")
+
+                second_weapon_options = []
+
+                for weapon in dual_wield_weapons:
+                    if weapon != first_weapon or inventory[weapon] >= 2:
+                        second_weapon_options.append(weapon)
+
+                if not second_weapon_options:
+                    print("You don't own any suitable weapons for dual-wielding!")
+
+                else:
+                    print("\nChoose your second weapon:")
+
+                    for number, weapon in enumerate(second_weapon_options, start=1):
+                        print(f"{number}. {weapon}")
+
+                    while True:
+                        try:
+                            second_choice = int(input("\nChoose your second weapon: "))
+
+                            if 1<= second_choice <= len(second_weapon_options):
+                                break
+                            else:
+                                print("Please enter a valid NUMBER!")
+
+                        except ValueError:
+                            print("Please enter a valid number!")
+
+                    second_weapon = second_weapon_options[second_choice - 1]
+                    return [
+                        {"weapon": first_weapon, "hands": 1},
+                        {"weapon": second_weapon, "hands": 1},
+                    ], equipped_shield
+
+
+
+
+        else:
+            print("That's not a valid choice!")
+
+
+def choose_equipped_shield(inventory):
+    if inventory.get("Shield", 0) > 0:
+        print("\nYou have a shield available to equip")
+        while True:
+            answer = input("Would you like to equip your shield? (yes/no): ").strip().lower()
+            if answer == "yes":
+                print("You have equipped your shield!")
+                return True
+            elif answer == "no":
+                return False
+            else:
+                print("That's not a valid answer now, is it! Answer yes or no.")
+    else:
+        print("\nYou have no shield available to equip")
+        return False
+
 
 def choose_starting_weapon(category, attack_type=None):
     available_weapons = get_available_weapons(category, attack_type)
@@ -1971,6 +2266,13 @@ if character_class == "Cleric":
 
 print("\nCurrent inventory", character_equipment)
 
+equipped_armour = choose_equipped_armour(character_equipment)
+equipped_shield = choose_equipped_shield(character_equipment)
+
+equipped_weapons, equipped_shield = choose_equipped_weapon(character_equipment, equipped_shield)
+
+print(f"\nEquipped weapons: {equipped_weapons}")
+print(f"Shield equipped: {equipped_shield}")
 
 
 
