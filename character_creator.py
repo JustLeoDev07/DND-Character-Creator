@@ -1,4 +1,5 @@
 import random
+import math
 
 def roll_dice(sides):
     return random.randint(1, sides)
@@ -24,152 +25,415 @@ all_skill_options = [
     "Sleight of Hand", "Stealth", "Survival"
 ]
 
-weapon_categories = {
-    "Club": "Simple Weapons",
-    "Dagger": "Simple Weapons",
-    "Dart": "Simple Weapons",
-    "Handaxe": "Simple Weapons",
-    "Light Crossbow": "Simple Weapons",
-    "Light Hammer": "Simple Weapons",
-    "Quarterstaff": "Simple Weapons",
-    "Shortbow": "Simple Weapons",
-    "Sling": "Simple Weapons",
-    "Greatclub": "Simple Weapons",
-    "Javelin": "Simple Weapons",
-    "Mace": "Simple Weapons",
-    "Sickle": "Simple Weapons",
-    "Spear": "Simple Weapons",
 
-    "Battleaxe": "Martial Weapons",
-    "Hand Crossbow": "Martial Weapons",
-    "Longbow": "Martial Weapons",
-    "Longsword": "Martial Weapons",
-    "Rapier": "Martial Weapons",
-    "Shortsword": "Martial Weapons",
-    "Warhammer": "Martial Weapons",
-    "Flail": "Martial Weapons",
-    "Glaive": "Martial Weapons",
-    "Greatsword": "Martial Weapons",
-    "Halberd": "Martial Weapons",
-    "Lance": "Martial Weapons",
-    "Maul": "Martial Weapons",
-    "Morningstar": "Martial Weapons",
-    "Pike": "Martial Weapons",
-    "Scimitar": "Martial Weapons",
-    "Trident": "Martial Weapons",
-    "War Pick": "Martial Weapons",
-    "Whip": "Martial Weapons",
-    "Blowgun": "Martial Weapons",
-    "Heavy Crossbow": "Martial Weapons",
-    "Net": "Martial Weapons",
-    "Greataxe": "Martial Weapons"
+battle_master_manoeuvres = {
+    "Commander's Strike": {
+        "description": "Forgo one attack and use a bonus action to let an ally attack using their reaction, adding the superiority die to damage."
+    },
+
+    "Disarming Attack": {
+        "description": "Add the superiority die to weapon damage. The target makes a Strength save or drops a held item."
+    },
+
+    "Distracting Strike": {
+        "description": "Add the superiority die to weapon damage. The next attack by another creature against the target gains advantage before your next turn."
+    },
+
+    "Evasive Footwork": {
+        "description": "While moving, add the superiority die roll to your AC until you stop moving."
+    },
+
+    "Feinting Attack": {
+        "description": "Use a bonus action to gain advantage on your next attack this turn against a creature within 5 feet, adding the die to damage if it hits."
+    },
+
+    "Goading Attack": {
+        "description": "Add the superiority die to weapon damage. A failed Wisdom save gives the target disadvantage on attacks against creatures other than you."
+    },
+
+    "Lunging Attack": {
+        "description": "Increase the reach of a melee weapon attack by 5 feet on your turn, adding the superiority die to damage if it hits."
+    },
+
+    "Maneuvering Attack": {
+        "description": "Add the superiority die to weapon damage. An ally can use their reaction to move up to half their speed without provoking an opportunity attack from the target."
+    },
+
+    "Menacing Attack": {
+        "description": "Add the superiority die to weapon damage. A failed Wisdom save frightens the target until the end of your next turn."
+    },
+
+    "Parry": {
+        "description": "Use your reaction when damaged by a melee attack to reduce the damage by the superiority die roll plus your Dexterity modifier."
+    },
+
+    "Precision Attack": {
+        "description": "Add the superiority die roll to a weapon attack roll, before or after rolling but before the attack's effects are applied."
+    },
+
+    "Pushing Attack": {
+        "description": "Add the superiority die to weapon damage. A Large or smaller target that fails a Strength save is pushed up to 15 feet."
+    },
+
+    "Rally": {
+        "description": "Use a bonus action to grant an ally who can see or hear you temporary hit points equal to the superiority die roll plus your Charisma modifier."
+    },
+
+    "Riposte": {
+        "description": "When a creature misses you with a melee attack, use your reaction to make a melee weapon attack, adding the die to damage if it hits."
+    },
+
+    "Sweeping Attack": {
+        "description": "After hitting with a melee weapon attack, potentially damage a second nearby creature for an amount equal to the superiority die roll."
+    },
+
+    "Trip Attack": {
+        "description": "Add the superiority die to weapon damage. A Large or smaller target that fails a Strength save falls prone."
+    }
 }
 
-weapon_attack_types = {
-    # Melee Weapons
-    "Club": "Melee",
-    "Dagger": "Melee",
-    "Greatclub": "Melee",
-    "Handaxe": "Melee",
-    "Javelin": "Melee",
-    "Light Hammer": "Melee",
-    "Mace": "Melee",
-    "Quarterstaff": "Melee",
-    "Sickle": "Melee",
-    "Spear": "Melee",
-
-    "Battleaxe": "Melee",
-    "Flail": "Melee",
-    "Glaive": "Melee",
-    "Greataxe": "Melee",
-    "Greatsword": "Melee",
-    "Halberd": "Melee",
-    "Lance": "Melee",
-    "Longsword": "Melee",
-    "Maul": "Melee",
-    "Morningstar": "Melee",
-    "Pike": "Melee",
-    "Rapier": "Melee",
-    "Scimitar": "Melee",
-    "Shortsword": "Melee",
-    "Trident": "Melee",
-    "War Pick": "Melee",
-    "Warhammer": "Melee",
-    "Whip": "Melee",
-
-    # ranged
-
-    "Light Crossbow": "Ranged",
-    "Dart": "Ranged",
-    "Shortbow": "Ranged",
-    "Sling": "Ranged",
-
-    "Blowgun": "Ranged",
-    "Hand Crossbow": "Ranged",
-    "Heavy Crossbow": "Ranged",
-    "Longbow": "Ranged",
-    "Net": "Ranged",
+fighting_styles = {
+    "Archery": {
+        "description": "You gain a +2 bonus to attack rolls you make with ranged weapons."
+    },
+    "Defense": {
+        "description": "While you are wearing armour, you gain a +1 bonus to AC."
+    },
+    "Dueling": {
+        "description": "You gain a +2 damage bonus when wielding a melee weapon in one hand and no other weapons."
+    },
+    "Great Weapon Fighting": {
+        "description": "You can reroll a 1 or 2 on eligible two-handed melee weapon damage dice."
+    },
+    "Protection": {
+        "description": "While wielding a shield, you can use your reaction to impose disadvantage on an attack against another creature within 5 feet."
+    },
+    "Two-Weapon Fighting": {
+        "description": "You can add your ability modifier to the damage of your second attack when two-weapon fighting."
+    }
 }
 
-weapon_properties = {
-    # Melee Weapons
-    "Club": ["Light"],
-    "Dagger": ["Finesse", "Light", "Thrown"],
-    "Greatclub": ["Two-Handed"],
-    "Handaxe": ["Light", "Thrown"],
-    "Javelin": ["Thrown"],
-    "Light Hammer": ["Light", "Thrown"],
-    "Mace": [],
-    "Quarterstaff": ["Versatile"],
-    "Sickle": ["Light"],
-    "Spear": ["Thrown", "Versatile"],
+weapon_data = {
+    "Club": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": ["Light"],
+        "damage": "1d4",
+        "damage_type": "Bludgeoning",
+        "versatile_damage": None
+    },
+    "Dagger": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": ["Finesse", "Light", "Thrown"],
+        "damage": "1d4",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Greatclub": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": ["Two-Handed"],
+        "damage": "1d8",
+        "damage_type": "Bludgeoning",
+        "versatile_damage": None
+    },
+    "Handaxe": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": ["Light", "Thrown"],
+        "damage": "1d6",
+        "damage_type": "Slashing",
+        "versatile_damage": None
+    },
+    "Javelin": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": ["Thrown"],
+        "damage": "1d6",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Light Hammer": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": ["Light", "Thrown"],
+        "damage": "1d4",
+        "damage_type": "Bludgeoning",
+        "versatile_damage": None
+    },
+    "Mace": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": [],
+        "damage": "1d6",
+        "damage_type": "Bludgeoning",
+        "versatile_damage": None
+    },
+    "Quarterstaff": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": ["Versatile"],
+        "damage": "1d6",
+        "damage_type": "Bludgeoning",
+        "versatile_damage": "1d8"
+    },
+    "Sickle": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": ["Light"],
+        "damage": "1d4",
+        "damage_type": "Slashing",
+        "versatile_damage": None
+    },
+    "Spear": {
+        "category": "Simple Weapons",
+        "attack_type": "Melee",
+        "properties": ["Thrown", "Versatile"],
+        "damage": "1d6",
+        "damage_type": "Piercing",
+        "versatile_damage": "1d8"
+    },
 
-    "Battleaxe": ["Versatile"],
-    "Flail": [],
-    "Glaive": ["Heavy", "Reach", "Two-Handed"],
-    "Greataxe": ["Heavy", "Two-Handed"],
-    "Greatsword": ["Heavy", "Two-Handed"],
-    "Halberd": ["Heavy", "Reach", "Two-Handed"],
-    "Lance": ["Reach", "Special"],
-    "Longsword": ["Versatile"],
-    "Maul": ["Heavy", "Two-Handed"],
-    "Morningstar": [],
-    "Pike": ["Heavy", "Reach", "Two-Handed"],
-    "Rapier": ["Finesse"],
-    "Scimitar": ["Finesse", "Light"],
-    "Shortsword": ["Finesse", "Light"],
-    "Trident": ["Thrown", "Versatile"],
-    "War Pick": [],
-    "Warhammer": ["Versatile"],
-    "Whip": ["Finesse", "Reach"],
+    # SIMPLE RANGED WEAPONS
+    "Light Crossbow": {
+        "category": "Simple Weapons",
+        "attack_type": "Ranged",
+        "properties": ["Ammunition", "Loading", "Two-Handed"],
+        "damage": "1d8",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Dart": {
+        "category": "Simple Weapons",
+        "attack_type": "Ranged",
+        "properties": ["Finesse", "Thrown"],
+        "damage": "1d4",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Shortbow": {
+        "category": "Simple Weapons",
+        "attack_type": "Ranged",
+        "properties": ["Ammunition", "Two-Handed"],
+        "damage": "1d6",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Sling": {
+        "category": "Simple Weapons",
+        "attack_type": "Ranged",
+        "properties": ["Ammunition"],
+        "damage": "1d4",
+        "damage_type": "Bludgeoning",
+        "versatile_damage": None
+    },
 
-    # Ranged Weapons
-    "Light Crossbow": ["Ammunition", "Loading", "Two-Handed"],
-    "Dart": ["Finesse", "Thrown"],
-    "Shortbow": ["Ammunition", "Two-Handed"],
-    "Sling": ["Ammunition"],
+    # MARTIAL MELEE WEAPONS
+    "Battleaxe": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Versatile"],
+        "damage": "1d8",
+        "damage_type": "Slashing",
+        "versatile_damage": "1d10"
+    },
+    "Flail": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": [],
+        "damage": "1d8",
+        "damage_type": "Bludgeoning",
+        "versatile_damage": None
+    },
+    "Glaive": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Heavy", "Reach", "Two-Handed"],
+        "damage": "1d10",
+        "damage_type": "Slashing",
+        "versatile_damage": None
+    },
+    "Greataxe": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Heavy", "Two-Handed"],
+        "damage": "1d12",
+        "damage_type": "Slashing",
+        "versatile_damage": None
+    },
+    "Greatsword": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Heavy", "Two-Handed"],
+        "damage": "2d6",
+        "damage_type": "Slashing",
+        "versatile_damage": None
+    },
+    "Halberd": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Heavy", "Reach", "Two-Handed"],
+        "damage": "1d10",
+        "damage_type": "Slashing",
+        "versatile_damage": None
+    },
+    "Lance": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Reach", "Special"],
+        "damage": "1d12",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Longsword": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Versatile"],
+        "damage": "1d8",
+        "damage_type": "Slashing",
+        "versatile_damage": "1d10"
+    },
+    "Maul": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Heavy", "Two-Handed"],
+        "damage": "2d6",
+        "damage_type": "Bludgeoning",
+        "versatile_damage": None
+    },
+    "Morningstar": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": [],
+        "damage": "1d8",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Pike": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Heavy", "Reach", "Two-Handed"],
+        "damage": "1d10",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Rapier": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Finesse"],
+        "damage": "1d8",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Scimitar": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Finesse", "Light"],
+        "damage": "1d6",
+        "damage_type": "Slashing",
+        "versatile_damage": None
+    },
+    "Shortsword": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Finesse", "Light"],
+        "damage": "1d6",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Trident": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Thrown", "Versatile"],
+        "damage": "1d6",
+        "damage_type": "Piercing",
+        "versatile_damage": "1d8"
+    },
+    "War Pick": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": [],
+        "damage": "1d8",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Warhammer": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Versatile"],
+        "damage": "1d8",
+        "damage_type": "Bludgeoning",
+        "versatile_damage": "1d10"
+    },
+    "Whip": {
+        "category": "Martial Weapons",
+        "attack_type": "Melee",
+        "properties": ["Finesse", "Reach"],
+        "damage": "1d4",
+        "damage_type": "Slashing",
+        "versatile_damage": None
+    },
 
-    "Blowgun": ["Ammunition", "Loading"],
-    "Hand Crossbow": ["Ammunition", "Light", "Loading"],
-    "Heavy Crossbow": ["Ammunition", "Heavy", "Loading", "Two-Handed"],
-    "Longbow": ["Ammunition", "Heavy", "Two-Handed"],
-    "Net": ["Special", "Thrown"]
+    # MARTIAL RANGED WEAPONS
+    "Blowgun": {
+        "category": "Martial Weapons",
+        "attack_type": "Ranged",
+        "properties": ["Ammunition", "Loading"],
+        "damage": "1",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Hand Crossbow": {
+        "category": "Martial Weapons",
+        "attack_type": "Ranged",
+        "properties": ["Ammunition", "Light", "Loading"],
+        "damage": "1d6",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Heavy Crossbow": {
+        "category": "Martial Weapons",
+        "attack_type": "Ranged",
+        "properties": ["Ammunition", "Heavy", "Loading", "Two-Handed"],
+        "damage": "1d10",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Longbow": {
+        "category": "Martial Weapons",
+        "attack_type": "Ranged",
+        "properties": ["Ammunition", "Heavy", "Two-Handed"],
+        "damage": "1d8",
+        "damage_type": "Piercing",
+        "versatile_damage": None
+    },
+    "Net": {
+        "category": "Martial Weapons",
+        "attack_type": "Ranged",
+        "properties": ["Special", "Thrown"],
+        "damage": None,
+        "damage_type": None,
+        "versatile_damage": None
+    }
 }
 
-armour_names = [
-    "Padded Armour",
-    "Leather Armour",
-    "Studded Leather Armour",
-    "Hide Armour",
-    "Chain Shirt",
-    "Scale Mail",
-    "Breastplate",
-    "Half Plate",
-    "Ring Mail",
-    "Chain Mail",
-    "Splint",
-    "Plate"
-]
+armour_names = {
+    "Padded Armour": {"base_ac": 11, "category": "Light"},
+    "Leather Armour": {"base_ac": 11, "category": "Light"},
+    "Studded Leather Armour": {"base_ac": 12, "category": "Light"},
+
+    "Hide Armour": {"base_ac": 12, "category": "Medium"},
+    "Chain Shirt": {"base_ac": 13, "category": "Medium" },
+    "Scale Mail": {"base_ac": 14, "category": "Medium"},
+    "Breastplate": {"base_ac": 14, "category": "Medium"},
+    "Half Plate": {"base_ac": 15, "category": "Medium"},
+
+    "Ring Mail": {"base_ac": 14, "category": "Heavy"},
+    "Chain Mail": {"base_ac": 16, "category": "Heavy"},
+    "Splint": {"base_ac": 17, "category": "Heavy"},
+    "Plate": {"base_ac": 18, "category": "Heavy"},
+}
 
 available_tool_types = {
     "Artisan's Tools": ["Smith's Tools", "Carpenter's Tools", "Alchemist's Tools", "Brewer's Supplies"
@@ -544,7 +808,6 @@ character_classes = {
             }
         }
         },
-
 
     3: {"name": "Rogue",
         "hit_die": 8,
@@ -927,9 +1190,9 @@ def add_equipment(inventory, item_name,quantity):
 def get_available_weapons(category, attack_type=None):
     available_weapons = []
 
-    for weapon_name, weapon_category in weapon_categories.items():
-        if weapon_category == category:
-            if attack_type is None or weapon_attack_types[weapon_name] == attack_type:
+    for weapon_name, weapon_info in weapon_data.items():
+        if weapon_info["category"] == category:
+            if attack_type is None or weapon_info["attack_type"] == attack_type:
                 available_weapons.append(weapon_name)
 
     return available_weapons
@@ -944,7 +1207,7 @@ def get_available_armour(inventory):
 def get_owned_weapons(inventory):
     available_weapons = []
     for items in inventory:
-        if items in weapon_categories and inventory[items] > 0:
+        if items in weapon_data and inventory[items] > 0:
             available_weapons.append(items)
     return available_weapons
 
@@ -1002,7 +1265,7 @@ def choose_equipped_weapon(inventory, equipped_shield ):
             one_handed_weapons = []
 
             for weapon in available_weapons:
-                if "Two-Handed" not in weapon_properties[weapon]:
+                if "Two-Handed" not in weapon_data[weapon]["properties"]:
                     one_handed_weapons.append(weapon)
 
             if not one_handed_weapons:
@@ -1031,7 +1294,8 @@ def choose_equipped_weapon(inventory, equipped_shield ):
             two_handed_weapons = []
 
             for weapon in available_weapons:
-                if "Two-Handed" in weapon_properties[weapon] or "Versatile" in weapon_properties[weapon]:
+                properties = weapon_data[weapon]["properties"]
+                if "Two-Handed" in properties or "Versatile" in properties:
                     two_handed_weapons.append(weapon)
 
             if not two_handed_weapons:
@@ -1071,7 +1335,10 @@ def choose_equipped_weapon(inventory, equipped_shield ):
             dual_wield_weapons = []
 
             for weapon in available_weapons:
-                if "Light" in weapon_properties[weapon] and weapon_attack_types[weapon] == "Melee":
+                properties = weapon_data[weapon]["properties"]
+                attack_type = weapon_data[weapon]["attack_type"]
+
+                if "Light" in properties and attack_type == "Melee":
                     dual_wield_weapons.append(weapon)
 
             total_duel_wield_weapons = 0
@@ -1211,6 +1478,468 @@ def choose_equipment_option(options):
 
         except ValueError:
             print("Please choose a NUMBER in the list!")
+
+def calculate_armour_class(equipped_armour, equipped_shield, dexterity_modifier, character_class, constitution_modifier):
+    if character_class == "Barbarian" and equipped_armour is None:
+        armour_class = 10 + dexterity_modifier + constitution_modifier
+    elif equipped_armour is None:
+        armour_class = 10 + dexterity_modifier
+    else:
+        armour_info = armour_names[equipped_armour]
+        base_ac = armour_info["base_ac"]
+        category = armour_info["category"]
+
+        if category == "Light":
+            armour_class = base_ac + dexterity_modifier
+
+        elif category == "Medium":
+            armour_class = base_ac + min(dexterity_modifier, 2)
+
+        else:
+            armour_class = base_ac
+
+    if equipped_shield == True:
+        armour_class += 2
+
+    return armour_class
+
+def calculate_weapon_attack_bonus(weapon_name, strength_modifier, dexterity_modifier, proficiency_bonus, known_weapon_proficiencies, attack_mode=None, finesse_ability=None):
+    weapon_info = weapon_data[weapon_name]
+    weapon_type = weapon_info["attack_type"]
+    properties = weapon_info["properties"]
+
+    if attack_mode is None:
+        attack_mode = weapon_type
+
+    if attack_mode not in ("Melee", "Ranged", "Thrown"):
+        raise ValueError("Invalid attack mode.")
+
+    if attack_mode == "Thrown":
+        if weapon_type != "Melee" or "Thrown" not in properties:
+            raise ValueError(f"{weapon_name} cannot be thrown.")
+
+    elif attack_mode != weapon_type:
+        raise ValueError(f"{weapon_name} cannot use {attack_mode} attacks.")
+
+    if weapon_type == "Melee":
+        ability_modifier = strength_modifier
+    else:
+        ability_modifier = dexterity_modifier
+
+    if "Finesse" in properties:
+        if finesse_ability == "Strength":
+            ability_modifier = strength_modifier
+        elif finesse_ability == "Dexterity":
+            ability_modifier = dexterity_modifier
+        elif finesse_ability is None:
+            ability_modifier = max(strength_modifier, dexterity_modifier)
+        else:
+            raise ValueError("Finesse ability must be Strength or Dexterity.")
+
+    attack_bonus = ability_modifier
+
+    if (
+        weapon_info["category"] in known_weapon_proficiencies
+        or weapon_name in known_weapon_proficiencies
+    ):
+        attack_bonus += proficiency_bonus
+
+    return attack_bonus
+
+def calculate_weapon_damage(weapon_name, hands, strength_modifier, dexterity_modifier, off_hand=False, attack_mode=None, finesse_ability=None, chosen_fighting_styles=None):
+    weapon_info = weapon_data[weapon_name]
+
+    weapon_type = weapon_info["attack_type"]
+    damage_dice = weapon_info["damage"]
+    damage_type = weapon_info["damage_type"]
+    properties = weapon_info["properties"]
+
+    if attack_mode is None:
+        attack_mode = weapon_type
+
+    if attack_mode not in ("Melee", "Ranged", "Thrown"):
+        raise ValueError("Invalid attack mode.")
+
+    if attack_mode == "Thrown":
+        if weapon_type != "Melee" or "Thrown" not in properties:
+            raise ValueError(f"{weapon_name} cannot use {attack_mode} attacks.")
+
+    elif attack_mode != weapon_type:
+        raise ValueError(f"{weapon_name} cannot use {attack_mode} attacks.")
+
+    if damage_dice is None:
+        return None, None, None
+
+    if hands == 2 and "Versatile" in properties:
+        damage_dice = weapon_info["versatile_damage"]
+
+    if weapon_type == "Melee":
+        damage_modifier = strength_modifier
+    else:
+        damage_modifier = dexterity_modifier
+
+    if "Finesse" in properties:
+        if finesse_ability == "Strength":
+            damage_modifier = strength_modifier
+        elif finesse_ability == "Dexterity":
+            damage_modifier = dexterity_modifier
+        elif finesse_ability is None:
+            damage_modifier = max(strength_modifier, dexterity_modifier)
+        else:
+            raise ValueError("Finesse ability must be strength or dexterity.")
+
+    damage_modifier = apply_two_weapon_fighting_style(damage_modifier, chosen_fighting_styles or [], off_hand)
+
+    return damage_dice, damage_modifier, damage_type
+
+def get_rage_info(character_level):
+    rage_progression = character_classes[5]["rage_progression"]
+
+    applicable_level = max(
+        level for level in rage_progression
+        if level <= character_level
+    )
+
+    return rage_progression[applicable_level]
+
+def qualifies_for_rage_damage(weapon_name, strength_modifier, dexterity_modifier, attack_mode="Melee", finesse_ability=None):
+    weapon_info = weapon_data[weapon_name]
+
+    if attack_mode != "Melee":
+        return False
+
+    if weapon_info["attack_type"] != "Melee":
+        return False
+
+    if "Finesse" in weapon_info["properties"]:
+        if finesse_ability == "Strength":
+            return True
+        elif finesse_ability == "Dexterity":
+            return False
+        elif finesse_ability is None:
+            return strength_modifier >= dexterity_modifier
+        else:
+            raise ValueError("Finesse ability must be Strength or Dexterity.")
+
+    return True
+
+def calculate_rage_damage_bonus(character_class, character_level, equipped_armour, weapon_name, strength_modifier, dexterity_modifier, attack_mode="Melee", finesse_ability=None):
+    if character_class != "Barbarian":
+        return 0
+
+    if equipped_armour is not None:
+        armour_category = armour_names[equipped_armour]["category"]
+
+        if armour_category == "Heavy":
+            return 0
+
+    if not qualifies_for_rage_damage(weapon_name, strength_modifier, dexterity_modifier, attack_mode, finesse_ability):
+        return 0
+
+    rage_info = get_rage_info(character_level)
+
+    return rage_info["damage_bonus"]
+
+def calculate_movement_speed(base_speed, character_class, character_level, equipped_armour):
+
+    movement_speed = base_speed
+
+    if character_class != "Barbarian" or character_level < 5:
+        return movement_speed
+
+    if equipped_armour is None:
+        movement_speed += 10
+
+    else:
+        armour_category = armour_names[equipped_armour]["category"]
+        if armour_category != "Heavy":
+            movement_speed += 10
+
+    return movement_speed
+
+def choose_fighting_styles(character_class, character_level, character_subclass):
+
+    chosen_fighting_styles = []
+
+    if character_class != "Fighter":
+        return chosen_fighting_styles
+
+    if character_subclass == "Champion" and character_level >= 10:
+        number_of_styles = 2
+    else:
+        number_of_styles = 1
+
+    print(f"\nAs a fighter you get to choose a fighting style, here is a list of them:")
+    for style_name, style_details in fighting_styles.items():
+        print(f"{style_name}: {style_details['description']}")
+
+    for choice_number in range(number_of_styles):
+        while True:
+            chosen_style = input("\nChoose your fighting style: ").strip().title()
+
+            if chosen_style not in fighting_styles:
+                print("That Fighting Style does not exist. Choose an existing one.")
+
+            elif chosen_style in chosen_fighting_styles:
+                print("You've already selected that Fighting Style...Choose another!")
+
+            else:
+                chosen_fighting_styles.append(chosen_style)
+
+                print(f"\nYou have chosen: {chosen_style}")
+                print(fighting_styles[chosen_style]["description"])
+
+                break
+
+    return chosen_fighting_styles
+
+def apply_defense_fighting_style(armour_class, chosen_fighting_styles, equipped_armour):
+
+    if "Defense" in chosen_fighting_styles and equipped_armour is not None:
+        armour_class += 1
+
+    return armour_class
+
+def apply_archery_fighting_style(attack_bonus, chosen_fighting_styles, weapon_name):
+
+    if "Archery" in chosen_fighting_styles and weapon_data[weapon_name]["attack_type"] == "Ranged":
+        attack_bonus += 2
+
+    return attack_bonus
+
+def apply_dueling_fighting_style(damage_modifier, chosen_fighting_styles, weapon_name, wielded_two_handed, wielding_another_weapon):
+
+    if "Dueling" not in chosen_fighting_styles:
+        return damage_modifier
+
+    if weapon_data[weapon_name]["attack_type"] != "Melee":
+        return damage_modifier
+
+    if "Two-Handed" in weapon_data[weapon_name]["properties"]:
+        return damage_modifier
+
+    if wielded_two_handed:
+        return damage_modifier
+
+    if wielding_another_weapon:
+        return damage_modifier
+
+    damage_modifier += 2
+    return damage_modifier
+
+def apply_two_weapon_fighting_style(ability_modifier, chosen_fighting_styles, is_second_weapon_attack):
+
+    if not is_second_weapon_attack:
+        return ability_modifier
+
+    if "Two-Weapon Fighting" in chosen_fighting_styles:
+        return ability_modifier
+
+    if ability_modifier < 0:
+        return ability_modifier
+    else:
+        return 0
+
+def calculate_sneak_attack(character_class, character_level):
+    if character_class != "Rogue":
+        return None
+
+    progression = character_classes[3]["sneak_attack_progression"]
+
+    eligible_levels = [
+        level for level in progression
+        if level <= character_level
+    ]
+
+    highest = max(eligible_levels)
+
+    damage_value = progression[highest]
+
+    return damage_value
+
+def calculate_remarkable_athlete_bonus(character_class, character_level, subclass_name, proficiency_bonus):
+    if character_class != "Fighter":
+        return None
+
+    if subclass_name != "Champion":
+        return None
+
+    if character_level < 7:
+        return None
+
+    athlete_bonus = math.ceil(proficiency_bonus / 2)
+
+    return athlete_bonus
+
+def calculate_superiority_dice(character_class, character_level, subclass_name):
+    if character_class != "Fighter":
+        return None
+
+    if subclass_name != "Battle Master":
+        return None
+
+    if character_level < 3:
+        return None
+
+    if character_level >= 15:
+        number_of_dice = 6
+    elif character_level >= 7:
+        number_of_dice = 5
+    else:
+        number_of_dice = 4
+
+    if character_level <= 9:
+        die_size = "d8"
+    elif character_level <= 17:
+        die_size = "d10"
+    else:
+        die_size = "d12"
+
+    return number_of_dice, die_size
+
+def calculate_superiority_dice(character_class, character_level, subclass_name):
+    if character_class != "Fighter":
+        return None
+
+    if subclass_name != "Battle Master":
+        return None
+
+    if character_level < 3:
+        return None
+
+    if character_level < 3:
+        return None
+
+    if character_level >= 18:
+        number_of_dice = 6
+        die_size = "d12"
+
+    elif character_level >= 15:
+        number_of_dice = 6
+        die_size = "d10"
+
+    elif character_level >= 10:
+        number_of_dice = 5
+        die_size = "d10"
+
+    elif character_level >= 7:
+        number_of_dice = 5
+        die_size = "d8"
+
+    else:
+        number_of_dice = 4
+        die_size = "d8"
+
+    return number_of_dice, die_size
+
+def calculate_manoeuvre_save_dc(character_class, character_level, subclass_name, proficiency_bonus, ability_modifier):
+    if character_class != "Fighter":
+        return None
+
+    if subclass_name != "Battle Master":
+        return None
+
+    if character_level < 3:
+        return None
+
+    save_dc = 8 + proficiency_bonus + ability_modifier
+
+    return save_dc
+
+def calculate_manoeuvres_known (character_class, character_level, subclass_name):
+    if character_class != "Fighter":
+        return None
+
+    if subclass_name != "Battle Master":
+        return None
+
+    if character_level < 3:
+        return None
+
+    if character_level <= 6:
+        manoeuvres_known = 3
+
+    elif character_level <= 9:
+        manoeuvres_known = 5
+
+    elif character_level <= 14:
+        manoeuvres_known = 7
+
+    else:
+        manoeuvres_known = 9
+
+    return manoeuvres_known
+
+def choose_manoeuvres(manoeuvres_known):
+    if manoeuvres_known is None:
+        return []
+
+    chosen_manoeuvres = []
+
+    manoeuvre_names = list(battle_master_manoeuvres)
+
+    for number, name in enumerate(manoeuvre_names, start=1):
+        print(f"{number}. {name}")
+
+    for selection in range(manoeuvres_known):
+        while True:
+            choice = input(f"Choose manoeuvre {selection + 1}: ")
+
+            if not choice.isdigit():
+                print("Please enter a number.")
+                continue
+
+            choice_number = int(choice)
+
+            if not 1 <= choice_number <= len(manoeuvre_names):
+                print("Please choose a valid number.")
+                continue
+
+            selected_manoeuvre = manoeuvre_names[choice_number - 1]
+
+            if selected_manoeuvre in chosen_manoeuvres:
+                print("You chose this manoeuvre, please pick another one.")
+                continue
+
+            chosen_manoeuvres.append(selected_manoeuvre)
+            print(f"You have selected: {selected_manoeuvre}")
+            break
+
+    return chosen_manoeuvres
+
+def calculate_champion_critical_range(character_class, character_level, subclass_name):
+    if character_class != "Fighter":
+        return None
+
+    if subclass_name != "Champion":
+        return None
+
+    if character_level >= 15:
+        return 18
+
+    elif character_level >= 3:
+        return 19
+
+    return None
+
+def calculate_channel_divinity_uses(character_class, character_level):
+    channel_divinity_uses = None
+    if character_class != "Cleric":
+        return None
+
+    if character_level < 2:
+        return None
+
+    if character_level <= 5:
+        channel_divinity_uses = 1
+
+    elif character_level <= 17:
+        channel_divinity_uses = 2
+
+    elif character_level <= 20:
+        channel_divinity_uses = 3
+
+    return channel_divinity_uses
 
 def barbarian_starting_equipment():
     first_choice = choose_equipment_option(["Greataxe", "Any martial melee weapon"])
@@ -1730,6 +2459,66 @@ def character_subclass_selection(character_class, character_level):
 
 character_subclass = character_subclass_selection(character_class, character_level)
 
+subclass_name = (
+    character_subclass["name"]
+    if character_subclass is not None
+    else None
+)
+
+chosen_fighting_styles = choose_fighting_styles(character_class, character_level, subclass_name)
+
+superiority_dice = calculate_superiority_dice(
+    character_class, character_level, subclass_name
+)
+
+manoeuvres_known = calculate_manoeuvres_known(
+    character_class, character_level, subclass_name
+)
+
+chosen_manoeuvres = choose_manoeuvres(manoeuvres_known)
+
+manoeuvre_save_dc = None
+
+if superiority_dice is not None:
+    while True:
+        chosen_ability = input("Choose to use strength or dexterity for your manoeuvre save DC: ").strip().lower()
+
+        if chosen_ability in ("strength", "dexterity"):
+            break
+
+        print("Please enter strength or dexterity for your manoeuvre save DC:")
+
+    chosen_modifier = character_modifiers[chosen_ability]
+
+    manoeuvre_save_dc = calculate_manoeuvre_save_dc(character_class, character_level, subclass_name, proficiency_bonus, chosen_modifier)
+
+if superiority_dice is not None:
+    number_of_dice, die_size = superiority_dice
+
+    print(f"""\nBATTLE MASTER FEATURES:
+Superiority Dice: {number_of_dice}{die_size}
+Superiority Dice Recovery: short or long rest
+Manouevre Save DC: {manoeuvre_save_dc}
+Manoeuvres Known: {manoeuvres_known}""")
+    print("\nChosen Manoeuvres:")
+
+    for manoeuvre in chosen_manoeuvres:
+        description = battle_master_manoeuvres[manoeuvre]["description"]
+        print(f" {manoeuvre}: {description}")
+
+
+remarkable_athlete_bonus = calculate_remarkable_athlete_bonus(
+    character_class,
+    character_level,
+    subclass_name,
+    proficiency_bonus
+)
+
+champion_critical_range = calculate_champion_critical_range(character_class, character_level, subclass_name)
+
+channel_divinity_uses = calculate_channel_divinity_uses(character_class, character_level)
+if channel_divinity_uses is not None:
+    print(f"\nAs a cleric, you have {channel_divinity_uses} use(s) of channel divinity, use it wisely! ")
 
 print("""\n 
 ===================
@@ -1777,6 +2566,11 @@ def calculate_hit_points(level, hit_die, constitution_modifier):
 character_hp = calculate_hit_points(character_level, hit_die, character_modifiers["constitution"])
 
 initiative_bonus = character_modifiers["dexterity"]
+
+if remarkable_athlete_bonus is not None:
+    initiative_bonus += remarkable_athlete_bonus
+
+
 print(f"""\n To determine how quickly your character reacts to combat, you will need to roll initiative when your DM asks! 
 
 Your initiative bonus is {initiative_bonus:+}! 
@@ -1804,7 +2598,6 @@ if display_race[0].lower() in "aeiou":
 else:
     article = "a"
 
-print(f"\nAs you're {article} {display_race} your movement speed is {movement_speed}!")
 
 for languages in character_races.values():
     if languages["name"] == character_race:
@@ -2179,12 +2972,17 @@ for skill_name, ability_name in skill_abilities.items():
     elif skill_name in known_character_skills:
         skill_bonuses[skill_name] = modifier + proficiency_bonus
 
+    elif remarkable_athlete_bonus is not None and ability_name in ("strength", "dexterity", "constitution"):
+        skill_bonuses[skill_name] = modifier + remarkable_athlete_bonus
+
 print("\nYour Skill proficiencies and bonuses:")
 for skill,bonus in skill_bonuses.items():
     if skill in expertise_skills:
         print(f"- {skill}: {bonus:+} (Expertise)")
     elif skill in known_character_skills:
         print(f"- {skill}: {bonus:+} (Proficient)")
+    elif remarkable_athlete_bonus is not None and skill_abilities[skill] in ("strength", "dexterity", "constitution"):
+        print(f"- {skill}: {bonus:+} (Remarkable Athlete)")
     else:
         print(f"- {skill}: {bonus:+}")
 
@@ -2244,7 +3042,7 @@ if character_subclass is not None:
 
 filtered_weapon_proficiencies = []
 for weapon in known_weapon_proficiencies:
-    category = weapon_categories.get(weapon)
+    category = weapon_data.get(weapon, {}).get("category")
     if category not in known_weapon_proficiencies:
         filtered_weapon_proficiencies.append(weapon)
 
@@ -2267,6 +3065,7 @@ if character_class == "Cleric":
 print("\nCurrent inventory", character_equipment)
 
 equipped_armour = choose_equipped_armour(character_equipment)
+movement_speed = calculate_movement_speed(movement_speed, character_class, character_level, equipped_armour)
 equipped_shield = choose_equipped_shield(character_equipment)
 
 equipped_weapons, equipped_shield = choose_equipped_weapon(character_equipment, equipped_shield)
@@ -2274,10 +3073,85 @@ equipped_weapons, equipped_shield = choose_equipped_weapon(character_equipment, 
 print(f"\nEquipped weapons: {equipped_weapons}")
 print(f"Shield equipped: {equipped_shield}")
 
+armour_class = calculate_armour_class(equipped_armour, equipped_shield, character_modifiers["dexterity"], character_class, character_modifiers["constitution"])
 
+armour_class = apply_defense_fighting_style(armour_class, chosen_fighting_styles, equipped_armour)
 
+print(f"Armour class: {armour_class}")
 
+for equipped_weapon in equipped_weapons:
+    weapon_name = equipped_weapon["weapon"]
+    attack_bonus = calculate_weapon_attack_bonus(weapon_name, character_modifiers["strength"], character_modifiers["dexterity"], proficiency_bonus, known_weapon_proficiencies)
 
+    attack_bonus = apply_archery_fighting_style(attack_bonus, chosen_fighting_styles, weapon_name)
+
+    print(f"{weapon_name} attack bonus: {attack_bonus:+d}")
+
+for index, equipped_weapon in enumerate(equipped_weapons):
+    weapon_name = equipped_weapon["weapon"]
+    hands = equipped_weapon["hands"]
+    wielded_two_handed = hands == 2
+    wielding_another_weapon = len(equipped_weapons) > 1
+
+    off_hand = len(equipped_weapons) == 2 and index == 1
+
+    damage_dice, damage_modifier, damage_type = calculate_weapon_damage(weapon_name, hands, character_modifiers["strength"], character_modifiers["dexterity"], off_hand, chosen_fighting_styles=chosen_fighting_styles)
+
+    if damage_dice is None:
+        print(f"{weapon_name} damage: No Damage")
+        continue
+
+    sneak_attack_damage = calculate_sneak_attack(character_class,character_level)
+    if character_class == "Rogue":
+        print(f"Sneak Attack: {sneak_attack_damage} damage")
+
+    damage_modifier = apply_dueling_fighting_style(damage_modifier, chosen_fighting_styles, weapon_name, wielded_two_handed, wielding_another_weapon)
+
+    if damage_modifier > 0:
+        damage_display = f"{damage_dice} + {damage_modifier}"
+    elif damage_modifier < 0:
+        damage_display = f"{damage_dice} - {abs(damage_modifier)}"
+    else:
+        damage_display = damage_dice
+
+    hand_label = " (Off-hand)" if off_hand else ""
+
+    print(f"{weapon_name}{hand_label} damage: {damage_display} {damage_type}")
+
+    if character_class == "Barbarian":
+        rage_bonus = calculate_rage_damage_bonus(character_class, character_level, equipped_armour, weapon_name, character_modifiers["strength"], character_modifiers["dexterity"])
+
+        raging_modifier = damage_modifier + rage_bonus
+
+        if raging_modifier > 0:
+            raging_damage_display = f"{damage_dice} + {raging_modifier}"
+        elif raging_modifier < 0:
+            raging_damage_display = f"{damage_dice} - {abs(raging_modifier)}"
+        else:
+            raging_damage_display = damage_dice
+
+        print(
+            f"{weapon_name}{hand_label} damage while Raging: "
+            f"{raging_damage_display} {damage_type}"
+        )
+
+print(f"\nAs you're {article} {display_race} your movement speed is {movement_speed}!")
+
+if remarkable_athlete_bonus is not None:
+    running_long_jump = character_stats["strength"]
+    running_long_jump += character_modifiers["strength"]
+
+    print(f"Remarkable Athlete Running Long Jump distance: {running_long_jump} ft")
+
+if chosen_fighting_styles:
+    print("\nFIGHTING STYLES:")
+
+    for style in chosen_fighting_styles:
+        print(f"\t{style}")
+
+if champion_critical_range is not None:
+    print("\nCHAMPION FEATURES:")
+    print(f"Critical Hit range: {champion_critical_range}-20")
 
 
 
