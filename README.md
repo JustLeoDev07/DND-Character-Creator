@@ -128,3 +128,9 @@ Current status: Functional and manually tested.
 The application has completed its planned feature development and testing, with the working version committed and pushed to GitHub.
 Disclaimer
 This is an independent educational project based on Dungeons & Dragons Fifth Edition (2014). It is not an official Wizards of the Coast product and is not affiliated with or endorsed by Wizards of the Coast.
+
+## Development Process and Evaluation
+
+For a detailed reflection on my development decisions, software
+engineering practices, testing, challenges and lessons learned,
+see my [Development Process and Evaluation](DEVELOPMENT_EVALUATION.md).
