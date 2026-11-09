@@ -1,0 +1,121 @@
+Development Process and Evaluation
+Project Background and Learning Approach
+I developed my D&D 5e Character Creator as a practical project to improve my Python programming skills and gain experience developing a larger software application.
+
+I initially began learning Python through an online programming bootcamp on YouTube. However, I found that applying my knowledge to a project I was personally interested in provided a much more valuable learning experience. Rather than solely following tutorials, I wanted to develop software that actually solved a practical problem, which let me apply my own knowledge independently.
+
+This approach reflects project-based learning and experiential learning, where knowledge is developed through practical application, problem-solving and reflection and I feel resonates with me a lot. Throughout the project, I learned that software does not need to be perfect in its first release. I can continue improving it through updates, refactoring and additional functionality.
+
+This helped me develop a more iterative approach to software development, where the application evolves through repeated cycles of implementation, testing, debugging and improvement.
+Requirements Analysis and User-Centred Design
+When designing the application, I wanted to recreate the process of completing a physical D&D character sheet while also taking inspiration from character creation systems such as Baldur's Gate 3. My intention was to make the application accessible to newer D&D players while remaining just as useful for experienced players.
+
+This demonstrates requirements analysis and user-centred design (UCD), as I considered the needs, expectations and experiences of the intended users and who would be using the application within my decision-making process. Additionally, I used my own experience as a D&D player and Dungeon Master to inform multiple design decisions.
+
+For example, I implemented a custom racial ability score system that allows non-Human characters to allocate a +2 and +1 bonus to different ability scores. This reflects a house rule used by my own D&D group and was intended to provide players with greater flexibility when creating characters.
+
+I also deliberately decided against implementing a combat simulator. From my experience as a Dungeon Master, I believe that much of the enjoyment of D&D comes from players interacting with one another around the table. I wanted the application to support that experience rather than replace it with additional screen-based gameplay. Lots of DM’s get annoyed when players use technology rather than engaging at the table as it can show a lack of interest. I took this into account when making my system, understanding the design trade-off and how it would work in favour of creating the best user-experience.
+
+This was an example of design trade-off analysis, where I evaluated potential functionality against the intended purpose of the application.
+Scope Management and Feature Prioritisation
+One of my main development decisions was limiting the initial application to five playable classes. I made this decision because I wanted to prioritise delivering a complete and functional project rather than attempting to implement every available D&D class within my available development time.
+
+This demonstrates scope management, requirements prioritisation and effective time management. By focusing on a smaller selection of classes, I was able to implement more detailed functionality, including subclasses, level-dependent abilities, equipment and spellcasting. I also tailored this to the classes that are better for beginner players and offer the most distinct playstyles.
+
+I also wanted to leave opportunities for future updates, such as additional races and classes as my programming skills elevate. With this in mind, my choices here reflect an incremental development approach, where further functionality can be introduced in later versions. The project also helped me understand that successful software development involves deciding which features should be included and which should be deferred.
+Structured Programming and Functional Decomposition
+I chose to organise much of my application using Python functions because I wanted different parts of the character creation process to work together without unnecessarily duplicating code. This approach demonstrates structured programming and functional decomposition, where a larger problem is divided into smaller, more manageable operations.
+
+For example, I used functions to handle calculations, character choices and the generation of information required for the final character sheet. I created reusable functions when I recognised that particular operations, such as calculating ability modifiers or processing player selections, would be needed consistently throughout the application.
+
+This supports the DRY (Don't Repeat Yourself) principle, which encourages developers to avoid unnecessary duplication of logic. Using functions also demonstrates abstraction, as the details of an operation can be handled within a function rather than repeated every time the result is required.
+
+As the project progressed, I became more confident in recognising when functionality should be placed into a reusable function rather than written as a larger continuous block of code. One lesson I learned was that planning these responsibilities earlier could have made the application's structure more consistent throughout.
+Data Modelling and Data-Driven Design
+D&D contains a large amount of interconnected information, including races, classes, subclasses, spells, equipment and character features. I chose to organise much of this information using Python dictionaries and lists.
+
+This was a data modelling decision, as I needed a structured way to represent complex information and retrieve it throughout the application. Python dictionaries use key-value pairs, which allowed me to access information through specific keys rather than creating separate variables for every character option. Lists were particularly useful for organising collections of related information. However, challenges did arise when differentiating between methods such as .extend(), get(), and append().
+
+This approach supports data-driven design, where application behaviour is influenced by structured data. Although, working with nested dictionaries and loops was initially another one of the most challenging parts of the project. I sometimes found it difficult to understand how to access particular keys, navigate nested structures and process information in the correct order.
+
+As I gained more experience, I became more confident with nested data structures, iteration and data traversal. By the later stages of development, I found these concepts considerably easier to understand and apply.
+Control Flow and Dependency Management
+The application relies heavily on control flow, including conditional statements and loops, to guide the user through character creation. Different character choices affect the information required later in the program.
+
+For example, a character's race, class, subclass and level determine which abilities, calculations and features should be available and then shown to the player on their final character sheet.
+
+This required me to consider data flow and dependencies between different parts of the application.
+
+As the program became larger, I discovered that adding functionality in one location could affect existing functionality elsewhere. Another example being the introduction of additional information into a function sometimes required updating its parameters and the arguments passed when calling it. This helped me understand the importance of function interfaces, dependency management and change impact analysis.
+
+I learned that even a relatively small change can have consequences elsewhere in a large application, particularly when different functions depend on shared information.
+Input Validation, Exception Handling and Defensive Programming
+I wanted the character creator to handle invalid user inputs without forcing the player to restart the entire process. Character creation can take time, restarting after a simple mistake would create an unnecessarily frustrating experience. To address this, I implemented input validation and defensive programming techniques.
+
+These included while loops, conditional statements and Python's try and except blocks to handle invalid inputs and exceptions such as ValueError.
+
+This allowed the program to request another response when the user entered an invalid selection. These techniques support robustness and graceful error recovery, allowing the application to recover from expected input errors without losing the user's progress. I also used string methods such as .strip(), .lower() and .capitalize() when processing user input. These helped me manage and standardise text entered by users.
+
+I wanted the application to feel welcoming, particularly for players unfamiliar with D&D character creation. One improvement I identified is that the guidance provided to users could be more consistent throughout the program. While I included friendly and informative messages near the beginning, additional contextual guidance in later sections could further improve the user experience.
+Character-Sheet Formatting and Presentation Logic
+Another challenge I encountered was formatting the final character sheet.
+
+At the beginning of development, I was more familiar with Python string methods for processing user input than with the formatting techniques needed to display information clearly. As I developed the character sheet, I learned more about output formatting and presentation logic, including how to organise and display information in a readable structure.
+
+This was important because the application needed to present a large amount of character information without making the final output difficult to understand. The experience helped me recognise that producing correct data is only part of software development. That information must also be presented clearly to the user for them to follow through the logical processes of an application.
+Testing, Debugging and Root Cause Analysis
+Throughout development, I used a combination of manual testing and AI-assisted debugging to identify and resolve issues. I used AI-assisted Development because it could help inspect large sections of code, identify syntax errors and highlight potential problems efficiently. I used this to support the functionality of my program rather than writing it for me. I carried out manual testing and investigated the application's functionality myself before resorting to AI. However, I found AI particularly useful for identifying smaller code issues, while my own testing focused heavily on whether the application behaved correctly according to D&D rules. This involved dynamic testing, where the program was executed and its behaviour observed.
+
+I also used code inspection and syntax checking, which are forms of static analysis, to identify potential problems without running the complete character creation process. When debugging, I tried to understand the underlying reason for a problem rather than only correcting the visible symptom. This demonstrates root cause analysis (RCA).
+
+Some of the most challenging issues involved loops that failed to terminate, ended prematurely or processed incorrect information. These were proven examples of logic errors and control-flow defects, which required me to investigate how loops, conditions and break statements interacted.
+
+One example occurred when Dragonborn racial features incorrectly appeared on a Human Fighter's character sheet. The issue was traced to how racial information was processed, and I corrected the relevant control flow before testing the character again. This experience reinforced the difference between a program running successfully and a program producing the correct results.
+Functional Testing and Regression Testing
+As the application developed, I carried out manual functional testing to verify that features behaved as intended. I tested lots of characters with different races, classes, subclasses and levels to check calculations, equipment, spellcasting and character-sheet output.
+
+I also tested important level boundaries where abilities become available or change. This is an example of boundary value analysis, as testing around these transitions can help identify incorrect conditions and calculations. After correcting problems, I repeated relevant tests to check that the original issues had been resolved and were functioning as normal again.
+
+This is known as regression testing, which helps identify whether changes have unintentionally affected existing functionality. As the project grew, I became increasingly aware of how important testing was because changes to one part of the application could affect another. I found that my specific approach preferred to write out all of the processes then test it all once implemented, rather than testing smaller units and applying it to the bigger picture.
+
+In future, I would consider introducing automated unit testing to verify individual calculations and functions more efficiently.
+Managing Software Complexity
+One of the biggest challenges was managing the application's increasing size. The project grew from approximately 1,000 lines of code to over 9,000 lines - thank you, dictionaries lol…
+
+As more features were introduced, it became harder to navigate the application and understand how different sections interacted. This helped me appreciate the importance of software complexity management, maintainability and clear program structure.
+
+This application currently uses a single-file structure.
+
+One advantage of this approach was that I could quickly locate functions and variables using tools such as Ctrl + F without needing to search through several files. On the other hand, as the project grew, reviewing and sharing large sections of code became more time-consuming.
+
+This demonstrated an architectural trade-off: an approach that was convenient during early development became less practical as the application increased in size.
+Modular Architecture, Separation of Concerns and Refactoring
+If I were restructuring the application, I would consider splitting it into multiple Python modules. For example, I could separate character data, calculations, input handling and character-sheet generation into different files.
+
+This would support a more modular architecture and the principle of SoC (separation of concerns). Separating responsibilities could improve cohesion, code readability and maintainability, making individual sections easier to understand and modify.
+
+I also recognise that some earlier structural decisions may have introduced technical debt, as they created additional maintenance work when the application became larger. A future improvement would involve refactoring the application to improve its internal structure while preserving the existing functionality.
+
+I would carry out regression testing during this process to verify that the changes had not introduced new errors.
+Version Control and GitHub
+I introduced Git and GitHub later in the development process.
+
+I chose Git because it provides a Version Control System (VCS) for tracking changes to my source code. I chose GitHub because it provides remote repository hosting and makes the project accessible to other developers and people reviewing my work.
+
+However, I now recognise that introducing version control earlier would have been beneficial. If I had established a Git repository at the beginning, I could have maintained a more complete commit history and change traceability, documenting the application's progression from a small program to its current version.
+
+In future projects, I would initialise version control at the beginning and create regular, meaningful commits as features are developed and tested.
+
+This would support better source code management and make it easier to review previous changes.
+General Reflection and Lessons Learned
+The most valuable lesson I learned from this project is that practical development can provide learning experiences that are difficult to gain through tutorials alone. Although online learning resources helped me understand the fundamentals of Python, building an application around a subject I was passionate about encouraged me to investigate problems and develop my own solutions independently.
+
+My understanding of functions, nested dictionaries, loops, input validation and debugging improved significantly throughout development. I also learned that software development is (like many things in life) not always a linear process. As I introduced new functionality, I sometimes needed to revisit earlier sections, modify function parameters, correct unexpected behaviour and reconsider previous design decisions.
+
+This helped me develop a more iterative and problem-solving approach to programming.
+
+If I were beginning another project of a similar size, I would spend more time on requirements specification, architectural planning and functional decomposition before implementing the main functionality. I would identify the responsibilities of different components earlier and consider which operations should be implemented as reusable functions.
+
+I would also establish version control from the beginning and plan for testing throughout development. Overall, this project has strengthened both my practical Python skills and my understanding of broader software engineering principles. It has helped me recognise that writing functional code is only one part of software development. Planning, maintainability, testing, debugging, user experience and continuous improvement are equally important.
+
+Most importantly, I have developed greater confidence in independently approaching technical challenges and understanding how the decisions I make as a developer affect the quality of the final application.
