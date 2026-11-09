@@ -127,6 +127,19 @@ Current status: Functional and manually tested.
 
 The application has completed its planned feature development and testing, with the working version committed and pushed to GitHub.
 Disclaimer
+
+
+## Licensing and Attribution
+
+### Source Code
+
+The original Python source code in this repository is released under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+### D&D Rules Content
+
+This work includes material taken from the System Reference Document 5.1 (“SRD 5.1”) by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode.
+
+The application also includes custom character creation rules and original Python implementations. The MIT License does not apply to third-party material except where the relevant rights permit it.
 This is an independent educational project based on Dungeons & Dragons Fifth Edition (2014). It is not an official Wizards of the Coast product and is not affiliated with or endorsed by Wizards of the Coast.
 
 ## Development Process and Evaluation
